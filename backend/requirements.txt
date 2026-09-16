@@ -1,0 +1,10 @@
+django>=4.2,<5.0
+psycopg2-binary>=2.9
+pgvector>=0.2
+python-dotenv>=1.0
+groq>=0.4
+google-generativeai>=0.5
+sentence-transformers>=2.2
+torch>=2.0
+django-cors-headers>=4.3
+requests>=2.31
