@@ -50,7 +50,7 @@ def _llm_chat(system_prompt: str, user_prompt: str) -> str:
     if provider == 'groq':
         client = _get_groq_client()
         response = client.chat.completions.create(
-            model="llama3-8b-8192",
+            model="openai/gpt-oss-20b",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},

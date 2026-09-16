@@ -151,7 +151,7 @@ def agent_endpoint(request):
                 with connection.cursor() as cursor:
                     cursor.execute(
                         f"UPDATE {table_name} SET pushed_to_global = TRUE "
-                        f"WHERE patient_ref_id = %s ORDER BY created_at DESC LIMIT 1",
+                        f"WHERE patient_ref_id = %s",
                         [patient_ref_id]
                     )
         except Exception as e:
