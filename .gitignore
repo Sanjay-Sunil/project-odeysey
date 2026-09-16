@@ -32,3 +32,4 @@ Thumbs.db
 # Django
 db.sqlite3
 staticfiles/
+.neon

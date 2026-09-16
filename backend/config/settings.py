@@ -50,7 +50,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database — Neon Postgres
-DATABASE_URL = os.getenv('DATABASE_URL', '')
+# Prefer DATABASE_URL_UNPOOLED (direct connection) for pgvector compatibility
+DATABASE_URL = os.getenv('DATABASE_URL_UNPOOLED', os.getenv('DATABASE_URL', ''))
 
 DATABASES = {
     'default': {
@@ -60,22 +61,22 @@ DATABASES = {
     }
 }
 
-# Parse DATABASE_URL if present
+# Parse DATABASE_URL using urllib.parse for robustness with Neon connection strings
 if DATABASE_URL:
-    import re
-    # Parse: postgresql://user:password@host:port/dbname?sslmode=require
-    pattern = r'postgresql://([^:]+):([^@]+)@([^:\/]+):?(\d+)?/([^?]+)(?:\?(.*))?'
-    match = re.match(pattern, DATABASE_URL)
-    if match:
+    from urllib.parse import urlparse, parse_qs
+    parsed = urlparse(DATABASE_URL)
+    if parsed.scheme in ('postgresql', 'postgres'):
+        query_params = parse_qs(parsed.query)
+        sslmode = query_params.get('sslmode', ['require'])[0]
         DATABASES['default'] = {
             'ENGINE': 'django.db.backends.postgresql',
-            'USER': match.group(1),
-            'PASSWORD': match.group(2),
-            'HOST': match.group(3),
-            'PORT': match.group(4) or '5432',
-            'NAME': match.group(5),
+            'USER': parsed.username or '',
+            'PASSWORD': parsed.password or '',
+            'HOST': parsed.hostname or 'localhost',
+            'PORT': str(parsed.port or 5432),
+            'NAME': parsed.path.lstrip('/'),
             'OPTIONS': {
-                'sslmode': 'require',
+                'sslmode': sslmode,
             },
         }
 
